@@ -15,3 +15,6 @@ with-darling = [ "with-syn", "darling_core" ]
 [dependencies]
 syn = { version = "1.0", default-features = false, features = [ "derive", "parsing" ], optional = true }
 darling_core = { version = "0.13", default-features = false, optional = true }
+
+[dev-dependencies]
+darling = { version = "0.13", default-features = false }

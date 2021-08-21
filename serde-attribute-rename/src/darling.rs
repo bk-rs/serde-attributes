@@ -22,3 +22,75 @@ impl FromMeta for Rename {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use darling::FromDeriveInput;
+    use syn::parse_str;
+
+    use crate::RenameIndependent;
+
+    #[derive(Debug, FromDeriveInput)]
+    #[darling(attributes(serde))]
+    struct SerdeDerive {
+        rename: Rename,
+    }
+
+    #[test]
+    fn test_normal() {
+        let input = r#"
+        #[derive(SerdeDerive)]
+        #[serde(rename = "name")]
+        pub struct Foo;
+        "#;
+        let serde_derive = SerdeDerive::from_derive_input(&parse_str(input).unwrap()).unwrap();
+        assert_eq!(serde_derive.rename, Rename::Normal("name".to_owned()));
+    }
+
+    #[test]
+    fn test_independent_only_serialize() {
+        let input = r#"
+        #[derive(SerdeDerive)]
+        #[serde(rename(serialize = "ser_name"))]
+        pub struct Foo;
+        "#;
+        let serde_derive = SerdeDerive::from_derive_input(&parse_str(input).unwrap()).unwrap();
+        assert_eq!(
+            serde_derive.rename,
+            Rename::Independent(RenameIndependent::Serialize("ser_name".to_owned()))
+        );
+    }
+
+    #[test]
+    fn test_independent_only_deserialize() {
+        let input = r#"
+        #[derive(SerdeDerive)]
+        #[serde(rename(deserialize = "de_name"))]
+        pub struct Foo;
+        "#;
+        let serde_derive = SerdeDerive::from_derive_input(&parse_str(input).unwrap()).unwrap();
+        assert_eq!(
+            serde_derive.rename,
+            Rename::Independent(RenameIndependent::Deserialize("de_name".to_owned()))
+        );
+    }
+
+    #[test]
+    fn test_independent_both() {
+        let input = r#"
+        #[derive(SerdeDerive)]
+        #[serde(rename(serialize = "ser_name", deserialize = "de_name"))]
+        pub struct Foo;
+        "#;
+        let serde_derive = SerdeDerive::from_derive_input(&parse_str(input).unwrap()).unwrap();
+        assert_eq!(
+            serde_derive.rename,
+            Rename::Independent(RenameIndependent::Both {
+                serialize: "ser_name".to_owned(),
+                deserialize: "de_name".to_owned()
+            })
+        );
+    }
+}
