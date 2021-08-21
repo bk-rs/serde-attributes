@@ -17,35 +17,49 @@ impl<'a> TryFrom<&'a Meta> for Rename {
 
     fn try_from(meta: &'a Meta) -> Result<Self, Self::Error> {
         match meta {
-            Meta::NameValue(ref m) if m.path.is_ident(RENAME) => match &m.lit {
-                Lit::Str(ref s) => Ok(Self::Normal(s.value())),
-                _ => Err(FromMetaError::LitTypeMismatch(&m.lit)),
-            },
-            Meta::List(ref m) if m.path.is_ident(RENAME) => {
+            Meta::NameValue(ref meta_name_value) if meta_name_value.path.is_ident(RENAME) => {
+                match &meta_name_value.lit {
+                    Lit::Str(ref s) => Ok(Self::Normal(s.value())),
+                    lit => Err(FromMetaError::LitTypeMismatch(lit)),
+                }
+            }
+            Meta::List(ref meta_list) if meta_list.path.is_ident(RENAME) => {
                 let mut ser_name = None;
                 let mut de_name = None;
 
-                for nested_meta in &m.nested {
+                for nested_meta in &meta_list.nested {
                     match nested_meta {
-                        NestedMeta::Meta(Meta::NameValue(m)) => {
-                            if m.path.is_ident(SERIALIZE) {
-                                match &m.lit {
+                        NestedMeta::Meta(Meta::NameValue(meta_name_value)) => {
+                            if meta_name_value.path.is_ident(SERIALIZE) {
+                                match &meta_name_value.lit {
                                     Lit::Str(ref s) => ser_name = Some(s.value()),
-                                    _ => return Err(FromMetaError::LitTypeMismatch(&m.lit)),
+                                    _ => {
+                                        return Err(FromMetaError::LitTypeMismatch(
+                                            &meta_name_value.lit,
+                                        ))
+                                    }
                                 }
-                            } else if m.path.is_ident(DESERIALIZE) {
-                                match &m.lit {
+                            } else if meta_name_value.path.is_ident(DESERIALIZE) {
+                                match &meta_name_value.lit {
                                     Lit::Str(ref s) => de_name = Some(s.value()),
-                                    _ => return Err(FromMetaError::LitTypeMismatch(&m.lit)),
+                                    _ => {
+                                        return Err(FromMetaError::LitTypeMismatch(
+                                            &meta_name_value.lit,
+                                        ))
+                                    }
                                 }
                             } else {
-                                return Err(FromMetaError::NestedMetaPathMismatch(m));
+                                return Err(FromMetaError::NestedMetaPathMismatch(
+                                    nested_meta,
+                                    meta_name_value,
+                                ));
                             }
                         }
-                        nm => return Err(FromMetaError::NestedMetaTypeMismatch(nm)),
+                        nested_meta => {
+                            return Err(FromMetaError::NestedMetaTypeMismatch(nested_meta))
+                        }
                     }
                 }
-
                 match (ser_name, de_name) {
                     (None, None) => Err(FromMetaError::AtLeastOneOfSerAndDe),
                     (None, Some(de_name)) => {
@@ -62,7 +76,7 @@ impl<'a> TryFrom<&'a Meta> for Rename {
                     }
                 }
             }
-            m => Err(FromMetaError::MetaTypeOrPathMismatch(m)),
+            meta => Err(FromMetaError::MetaTypeOrPathMismatch(meta)),
         }
     }
 }
@@ -71,7 +85,7 @@ pub enum FromMetaError<'a> {
     MetaTypeOrPathMismatch(&'a Meta),
     LitTypeMismatch(&'a Lit),
     NestedMetaTypeMismatch(&'a NestedMeta),
-    NestedMetaPathMismatch(&'a MetaNameValue),
+    NestedMetaPathMismatch(&'a NestedMeta, &'a MetaNameValue),
     AtLeastOneOfSerAndDe,
 }
 impl<'a> fmt::Debug for FromMetaError<'a> {
@@ -80,7 +94,7 @@ impl<'a> fmt::Debug for FromMetaError<'a> {
             Self::MetaTypeOrPathMismatch(_) => write!(f, "MetaTypeOrPathMismatch"),
             Self::LitTypeMismatch(_) => write!(f, "LitTypeMismatch"),
             Self::NestedMetaTypeMismatch(_) => write!(f, "NestedMetaTypeMismatch"),
-            Self::NestedMetaPathMismatch(_) => write!(f, "NestedMetaPathMismatch"),
+            Self::NestedMetaPathMismatch(_, _) => write!(f, "NestedMetaPathMismatch"),
             Self::AtLeastOneOfSerAndDe => write!(f, "AtLeastOneOfSerAndDe"),
         }
     }

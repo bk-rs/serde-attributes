@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2018"
 
 [package.metadata.docs.rs]
-features = [ "with-darling" ]
+features = [ "with-syn", "with-darling" ]
 
 [features]
-default = [ "with-darling" ]
+default = [ "with-syn", "with-darling" ]
 
 with-syn = [ "syn" ]
 with-darling = [ "with-syn", "darling_core" ]
