@@ -1,25 +1,25 @@
 use std::{convert::TryFrom, error, fmt};
 
-use syn::{Lit, Meta, NestedMeta};
+use syn::{Lit, Meta, MetaNameValue, NestedMeta};
 
 use crate::{Rename, RenameIndependent};
 
-/// [Official doc](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L23)
+/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L23)
 pub const RENAME: &str = "rename";
-/// [Official doc](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L26)
+/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L26)
 pub const SERIALIZE: &str = "serialize";
-/// [Official doc](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L14)
+/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L14)
 pub const DESERIALIZE: &str = "deserialize";
 
-/// [Official doc](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/attr.rs#L319-L333)
-impl TryFrom<&Meta> for Rename {
-    type Error = FromMetaError;
+/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/attr.rs#L319-L333)
+impl<'a> TryFrom<&'a Meta> for Rename {
+    type Error = FromMetaError<'a>;
 
-    fn try_from(meta: &Meta) -> Result<Self, Self::Error> {
+    fn try_from(meta: &'a Meta) -> Result<Self, Self::Error> {
         match meta {
             Meta::NameValue(ref m) if m.path.is_ident(RENAME) => match &m.lit {
                 Lit::Str(ref s) => Ok(Self::Normal(s.value())),
-                _ => Err(FromMetaError::LitTypeMismatch),
+                _ => Err(FromMetaError::LitTypeMismatch(&m.lit)),
             },
             Meta::List(ref m) if m.path.is_ident(RENAME) => {
                 let mut ser_name = None;
@@ -31,18 +31,18 @@ impl TryFrom<&Meta> for Rename {
                             if m.path.is_ident(SERIALIZE) {
                                 match &m.lit {
                                     Lit::Str(ref s) => ser_name = Some(s.value()),
-                                    _ => return Err(FromMetaError::LitTypeMismatch),
+                                    _ => return Err(FromMetaError::LitTypeMismatch(&m.lit)),
                                 }
                             } else if m.path.is_ident(DESERIALIZE) {
                                 match &m.lit {
                                     Lit::Str(ref s) => de_name = Some(s.value()),
-                                    _ => return Err(FromMetaError::LitTypeMismatch),
+                                    _ => return Err(FromMetaError::LitTypeMismatch(&m.lit)),
                                 }
                             } else {
-                                return Err(FromMetaError::NestedMetaPathMismatch);
+                                return Err(FromMetaError::NestedMetaPathMismatch(m));
                             }
                         }
-                        _ => return Err(FromMetaError::NestedMetaTypeMismatch),
+                        nm => return Err(FromMetaError::NestedMetaTypeMismatch(nm)),
                     }
                 }
 
@@ -62,21 +62,32 @@ impl TryFrom<&Meta> for Rename {
                     }
                 }
             }
-            _ => Err(FromMetaError::MetaTypeOrPathMismatch),
+            m => Err(FromMetaError::MetaTypeOrPathMismatch(m)),
         }
     }
 }
-#[derive(Debug)]
-pub enum FromMetaError {
-    MetaTypeOrPathMismatch,
-    LitTypeMismatch,
-    NestedMetaTypeMismatch,
-    NestedMetaPathMismatch,
+
+pub enum FromMetaError<'a> {
+    MetaTypeOrPathMismatch(&'a Meta),
+    LitTypeMismatch(&'a Lit),
+    NestedMetaTypeMismatch(&'a NestedMeta),
+    NestedMetaPathMismatch(&'a MetaNameValue),
     AtLeastOneOfSerAndDe,
 }
-impl fmt::Display for FromMetaError {
+impl<'a> fmt::Debug for FromMetaError<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::MetaTypeOrPathMismatch(_) => write!(f, "MetaTypeOrPathMismatch"),
+            Self::LitTypeMismatch(_) => write!(f, "LitTypeMismatch"),
+            Self::NestedMetaTypeMismatch(_) => write!(f, "NestedMetaTypeMismatch"),
+            Self::NestedMetaPathMismatch(_) => write!(f, "NestedMetaPathMismatch"),
+            Self::AtLeastOneOfSerAndDe => write!(f, "AtLeastOneOfSerAndDe"),
+        }
+    }
+}
+impl<'a> fmt::Display for FromMetaError<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self)
     }
 }
-impl error::Error for FromMetaError {}
+impl<'a> error::Error for FromMetaError<'a> {}

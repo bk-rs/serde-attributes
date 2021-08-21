@@ -1,3 +1,5 @@
+#[cfg(feature = "with-darling")]
+pub mod darling;
 #[cfg(feature = "with-syn")]
 pub mod syn;
 
