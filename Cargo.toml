@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "serde-attribute-rename",
+    "serde-attribute-rename-all",
+]
