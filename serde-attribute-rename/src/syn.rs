@@ -105,3 +105,87 @@ impl<'a> fmt::Display for FromMetaError<'a> {
     }
 }
 impl<'a> error::Error for FromMetaError<'a> {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use syn::{parse_str, DeriveInput, MetaList};
+
+    use crate::RenameIndependent;
+
+    fn to_meta(input: &str) -> Meta {
+        match parse_str::<DeriveInput>(input)
+            .unwrap()
+            .attrs
+            .first()
+            .unwrap()
+            .parse_meta()
+            .unwrap()
+        {
+            Meta::List(MetaList {
+                path,
+                paren_token: _,
+                nested,
+            }) if path.is_ident("serde") => match nested.first().cloned() {
+                Some(NestedMeta::Meta(meta)) => meta,
+                _ => panic!(),
+            },
+            meta => {
+                println!("{:?}", meta);
+                panic!()
+            }
+        }
+    }
+
+    #[test]
+    fn test_normal() {
+        let input = r#"
+        #[serde(rename = "name")]
+        pub struct Foo;
+        "#;
+        assert_eq!(
+            Rename::try_from(&to_meta(input)).unwrap(),
+            Rename::Normal("name".to_owned())
+        );
+    }
+
+    #[test]
+    fn test_independent_only_serialize() {
+        let input = r#"
+        #[serde(rename(serialize = "ser_name"))]
+        pub struct Foo;
+        "#;
+        assert_eq!(
+            Rename::try_from(&to_meta(input)).unwrap(),
+            Rename::Independent(RenameIndependent::Serialize("ser_name".to_owned()))
+        );
+    }
+
+    #[test]
+    fn test_independent_only_deserialize() {
+        let input = r#"
+        #[serde(rename(deserialize = "de_name"))]
+        pub struct Foo;
+        "#;
+        assert_eq!(
+            Rename::try_from(&to_meta(input)).unwrap(),
+            Rename::Independent(RenameIndependent::Deserialize("de_name".to_owned()))
+        );
+    }
+
+    #[test]
+    fn test_independent_both() {
+        let input = r#"
+        #[serde(rename(serialize = "ser_name", deserialize = "de_name"))]
+        pub struct Foo;
+        "#;
+        assert_eq!(
+            Rename::try_from(&to_meta(input)).unwrap(),
+            Rename::Independent(RenameIndependent::Both {
+                serialize: "ser_name".to_owned(),
+                deserialize: "de_name".to_owned()
+            })
+        );
+    }
+}

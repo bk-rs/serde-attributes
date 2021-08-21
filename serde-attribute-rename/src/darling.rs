@@ -44,6 +44,10 @@ mod tests {
         rename: Rename,
     }
 
+    fn to_serde_derive(input: &str) -> Result<SerdeDerive, DarlingError> {
+        SerdeDerive::from_derive_input(&parse_str(input).unwrap())
+    }
+
     #[test]
     fn test_normal() {
         let input = r#"
@@ -51,8 +55,10 @@ mod tests {
         #[serde(rename = "name")]
         pub struct Foo;
         "#;
-        let serde_derive = SerdeDerive::from_derive_input(&parse_str(input).unwrap()).unwrap();
-        assert_eq!(serde_derive.rename, Rename::Normal("name".to_owned()));
+        assert_eq!(
+            to_serde_derive(input).unwrap().rename,
+            Rename::Normal("name".to_owned())
+        );
     }
 
     #[test]
@@ -62,9 +68,8 @@ mod tests {
         #[serde(rename(serialize = "ser_name"))]
         pub struct Foo;
         "#;
-        let serde_derive = SerdeDerive::from_derive_input(&parse_str(input).unwrap()).unwrap();
         assert_eq!(
-            serde_derive.rename,
+            to_serde_derive(input).unwrap().rename,
             Rename::Independent(RenameIndependent::Serialize("ser_name".to_owned()))
         );
     }
@@ -76,9 +81,8 @@ mod tests {
         #[serde(rename(deserialize = "de_name"))]
         pub struct Foo;
         "#;
-        let serde_derive = SerdeDerive::from_derive_input(&parse_str(input).unwrap()).unwrap();
         assert_eq!(
-            serde_derive.rename,
+            to_serde_derive(input).unwrap().rename,
             Rename::Independent(RenameIndependent::Deserialize("de_name".to_owned()))
         );
     }
@@ -90,9 +94,8 @@ mod tests {
         #[serde(rename(serialize = "ser_name", deserialize = "de_name"))]
         pub struct Foo;
         "#;
-        let serde_derive = SerdeDerive::from_derive_input(&parse_str(input).unwrap()).unwrap();
         assert_eq!(
-            serde_derive.rename,
+            to_serde_derive(input).unwrap().rename,
             Rename::Independent(RenameIndependent::Both {
                 serialize: "ser_name".to_owned(),
                 deserialize: "de_name".to_owned()
