@@ -2,21 +2,39 @@ pub mod syn;
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
 pub enum Rename {
+    Normal(String),
+    Independent(RenameIndependent),
+}
+#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+pub enum RenameIndependent {
     Serialize(String),
     Deserialize(String),
-    Both(String),
+    Both {
+        serialize: String,
+        deserialize: String,
+    },
 }
 impl Rename {
     pub fn ser_name(&self) -> Option<&str> {
         match self {
-            Self::Serialize(name) | Self::Both(name) => Some(name),
+            Self::Normal(name)
+            | Self::Independent(RenameIndependent::Serialize(name))
+            | Self::Independent(RenameIndependent::Both {
+                serialize: name,
+                deserialize: _,
+            }) => Some(name),
             _ => None,
         }
     }
 
     pub fn de_name(&self) -> Option<&str> {
         match self {
-            Self::Deserialize(name) | Self::Both(name) => Some(name),
+            Self::Normal(name)
+            | Self::Independent(RenameIndependent::Deserialize(name))
+            | Self::Independent(RenameIndependent::Both {
+                serialize: _,
+                deserialize: name,
+            }) => Some(name),
             _ => None,
         }
     }
