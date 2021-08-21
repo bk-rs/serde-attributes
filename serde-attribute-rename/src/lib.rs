@@ -1,3 +1,4 @@
+#[cfg(feature = "with-syn")]
 pub mod syn;
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -49,20 +50,47 @@ mod tests {
         let name = "foo".to_owned();
 
         assert_eq!(
-            Rename::Serialize(name.to_owned()).ser_name(),
+            Rename::Normal(name.to_owned()).ser_name(),
             Some(name.as_str())
         );
-        assert_eq!(Rename::Deserialize(name.to_owned()).ser_name(), None);
         assert_eq!(
-            Rename::Both(name.to_owned()).ser_name(),
+            Rename::Normal(name.to_owned()).de_name(),
             Some(name.as_str())
         );
 
-        assert_eq!(Rename::Serialize(name.to_owned()).de_name(), None);
         assert_eq!(
-            Rename::Deserialize(name.to_owned()).de_name(),
+            Rename::Independent(RenameIndependent::Serialize(name.to_owned())).ser_name(),
             Some(name.as_str())
         );
-        assert_eq!(Rename::Both(name.to_owned()).de_name(), Some(name.as_str()));
+        assert_eq!(
+            Rename::Independent(RenameIndependent::Serialize(name.to_owned())).de_name(),
+            None
+        );
+
+        assert_eq!(
+            Rename::Independent(RenameIndependent::Deserialize(name.to_owned())).ser_name(),
+            None
+        );
+        assert_eq!(
+            Rename::Independent(RenameIndependent::Deserialize(name.to_owned())).de_name(),
+            Some(name.as_str())
+        );
+
+        assert_eq!(
+            Rename::Independent(RenameIndependent::Both {
+                serialize: name.to_owned(),
+                deserialize: name.to_owned(),
+            })
+            .ser_name(),
+            Some(name.as_str())
+        );
+        assert_eq!(
+            Rename::Independent(RenameIndependent::Both {
+                serialize: name.to_owned(),
+                deserialize: name.to_owned(),
+            })
+            .de_name(),
+            Some(name.as_str())
+        );
     }
 }
