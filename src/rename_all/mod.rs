@@ -1,3 +1,5 @@
+//! [Official doc](https://serde.rs/container-attrs.html#rename_all)
+
 pub use serde_rename_rule;
 
 use serde_rename_rule::RenameRule;

@@ -1,3 +1,5 @@
+//! [Official doc](https://serde.rs/container-attrs.html#rename)
+
 #[cfg(feature = "with-darling")]
 pub mod darling;
 #[cfg(feature = "with-syn")]

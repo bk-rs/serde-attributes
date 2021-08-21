@@ -3,7 +3,7 @@ use std::convert::TryFrom;
 use darling_core::{Error as DarlingError, FromMeta};
 use syn::Meta;
 
-pub use crate::{syn::FromMetaError, RenameAll};
+pub use super::{syn::FromMetaError, RenameAll};
 
 impl FromMeta for RenameAll {
     fn from_meta(meta: &Meta) -> Result<Self, DarlingError> {

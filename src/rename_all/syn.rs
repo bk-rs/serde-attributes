@@ -1,14 +1,11 @@
-pub use serde_attribute_rename::syn::{DESERIALIZE, SERIALIZE};
-
 use std::{convert::TryFrom, error, fmt};
 
-use serde_attribute_rename::{
-    syn::FromMetaError as RenameFromMetaError, Rename, RenameIndependent,
-};
 use serde_rename_rule::{ParseError as RenameRuleParseError, RenameRule};
 use syn::{Lit, Meta, MetaNameValue, NestedMeta};
 
-use crate::{RenameAll, RenameAllIndependent};
+use crate::rename::{syn::FromMetaError as RenameFromMetaError, Rename, RenameIndependent};
+
+use super::{RenameAll, RenameAllIndependent};
 
 /// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L24)
 pub const RENAME_ALL: &str = "rename_all";

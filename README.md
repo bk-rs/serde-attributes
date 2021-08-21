@@ -1,3 +1,7 @@
+# serde-attributes
+
+* [Cargo package](https://crates.io/crates/serde-attributes)
+
 ## Dev
 
 ```
@@ -9,7 +13,3 @@ cargo fmt -- --check
 cargo build-all-features
 cargo test-all-features -- --nocapture
 ```
-
-## Doc
-
-[Extract from](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/attr.rs#L290)

@@ -1,5 +1,31 @@
-[workspace]
-members = [
-    "serde-attribute-rename",
-    "serde-attribute-rename-all",
-]
+[package]
+name = "serde-attributes"
+version = "0.1.0"
+edition = "2018"
+
+[package.metadata.docs.rs]
+features = [ "all-attrs", "with-syn", "with-darling" ]
+
+[features]
+default = [ "all-attrs", "with-syn", "with-darling" ]
+
+all-attrs = [ "attr-rename", "attr-rename-all" ]
+attr-rename = []
+attr-rename-all = [ "attr-rename", "serde-rename-rule" ]
+
+with-syn = [ "syn" ]
+with-darling = [ "with-syn", "darling_core" ]
+
+[dependencies]
+syn = { version = "1.0", default-features = false, features = [ "derive", "parsing" ], optional = true }
+darling_core = { version = "0.13", default-features = false, optional = true }
+
+# attr-rename-all
+serde-rename-rule = { version = "0.1.1", default-features = false, optional = true }
+
+[dev-dependencies]
+darling = { version = "0.13", default-features = false }
+
+[package.metadata.cargo-all-features]
+skip_feature_sets = []
+skip_optional_dependencies = true

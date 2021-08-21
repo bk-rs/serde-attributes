@@ -2,14 +2,12 @@ use std::{convert::TryFrom, error, fmt};
 
 use syn::{Lit, Meta, MetaNameValue, NestedMeta};
 
-use crate::{Rename, RenameIndependent};
+use crate::{DESERIALIZE, SERIALIZE};
+
+use super::{Rename, RenameIndependent};
 
 /// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L23)
 pub const RENAME: &str = "rename";
-/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L26)
-pub const SERIALIZE: &str = "serialize";
-/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L14)
-pub const DESERIALIZE: &str = "deserialize";
 
 impl Rename {
     pub fn try_from_meta<'a>(meta: &'a Meta, path_name: &str) -> Result<Self, FromMetaError<'a>> {
