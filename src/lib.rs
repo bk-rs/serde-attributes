@@ -1,6 +1,11 @@
 //! Serde Attributes. [Extract from](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/attr.rs#L290)
 //!
 
+#[cfg(feature = "attr-alias")]
+pub mod alias;
+#[cfg(feature = "attr-alias")]
+pub use alias::Alias;
+
 #[cfg(feature = "attr-rename")]
 pub mod rename;
 #[cfg(feature = "attr-rename")]
