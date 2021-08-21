@@ -1,7 +1,16 @@
 [package]
 name = "serde-attributes"
 version = "0.1.0"
+authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2018"
+description = "Serde Attributes"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/bk-rs/serde-attributes"
+homepage = "https://github.com/bk-rs/serde-attributes"
+documentation = "https://docs.rs/serde-attributes"
+keywords = []
+categories = []
+readme = "README.md"
 
 [package.metadata.docs.rs]
 features = [ "all-attrs", "with-syn", "with-darling" ]
