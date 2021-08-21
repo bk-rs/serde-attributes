@@ -2,6 +2,8 @@ pub use serde_rename_rule;
 
 use serde_rename_rule::RenameRule;
 
+pub mod syn;
+
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
 pub enum RenameAll {
     Serialize(RenameRule),

@@ -3,4 +3,10 @@ name = "serde-attribute-rename"
 version = "0.1.0"
 edition = "2018"
 
+[features]
+default = [ "with-syn" ]
+
+with-syn = [ "syn" ]
+
 [dependencies]
+syn = { version = "1.0", default-features = false, features = [ "derive", "parsing" ], optional = true }

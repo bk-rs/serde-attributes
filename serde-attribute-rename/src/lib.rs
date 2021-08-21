@@ -1,3 +1,5 @@
+pub mod syn;
+
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
 pub enum Rename {
     Serialize(String),
