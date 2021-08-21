@@ -2,6 +2,8 @@ pub use serde_rename_rule;
 
 use serde_rename_rule::RenameRule;
 
+#[cfg(feature = "with-darling")]
+pub mod darling;
 #[cfg(feature = "with-syn")]
 pub mod syn;
 
