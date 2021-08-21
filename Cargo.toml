@@ -7,7 +7,7 @@ edition = "2018"
 features = [ "all-attrs", "with-syn", "with-darling" ]
 
 [features]
-default = [ "all-attrs", "with-syn", "with-darling" ]
+default = [ "all-attrs", "with-syn" ]
 
 all-attrs = [ "attr-rename", "attr-rename-all" ]
 attr-rename = []

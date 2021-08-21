@@ -10,6 +10,7 @@ use super::{Rename, RenameIndependent};
 pub const RENAME: &str = "rename";
 
 impl Rename {
+    /// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/attr.rs#L319-L333)
     pub fn try_from_meta<'a>(meta: &'a Meta, path_name: &str) -> Result<Self, FromMetaError<'a>> {
         match meta {
             Meta::NameValue(ref meta_name_value) if meta_name_value.path.is_ident(path_name) => {

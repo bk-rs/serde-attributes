@@ -10,6 +10,7 @@ use super::{RenameAll, RenameAllIndependent};
 /// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L24)
 pub const RENAME_ALL: &str = "rename_all";
 
+/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/attr.rs#L335-L364)
 impl<'a> TryFrom<&'a Meta> for RenameAll {
     type Error = FromMetaError<'a>;
 
