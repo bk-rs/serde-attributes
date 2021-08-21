@@ -49,50 +49,42 @@ mod tests {
 
     #[test]
     fn test_ser_name_and_de_name() {
-        let name = "foo".to_owned();
+        assert_eq!(Rename::Normal("foo".to_owned()).ser_name(), Some("foo"));
+        assert_eq!(Rename::Normal("foo".to_owned()).de_name(), Some("foo"));
 
         assert_eq!(
-            Rename::Normal(name.to_owned()).ser_name(),
-            Some(name.as_str())
+            Rename::Independent(RenameIndependent::Serialize("ser".to_owned())).ser_name(),
+            Some("ser")
         );
         assert_eq!(
-            Rename::Normal(name.to_owned()).de_name(),
-            Some(name.as_str())
-        );
-
-        assert_eq!(
-            Rename::Independent(RenameIndependent::Serialize(name.to_owned())).ser_name(),
-            Some(name.as_str())
-        );
-        assert_eq!(
-            Rename::Independent(RenameIndependent::Serialize(name.to_owned())).de_name(),
+            Rename::Independent(RenameIndependent::Serialize("ser".to_owned())).de_name(),
             None
         );
 
         assert_eq!(
-            Rename::Independent(RenameIndependent::Deserialize(name.to_owned())).ser_name(),
+            Rename::Independent(RenameIndependent::Deserialize("de".to_owned())).ser_name(),
             None
         );
         assert_eq!(
-            Rename::Independent(RenameIndependent::Deserialize(name.to_owned())).de_name(),
-            Some(name.as_str())
+            Rename::Independent(RenameIndependent::Deserialize("de".to_owned())).de_name(),
+            Some("de")
         );
 
         assert_eq!(
             Rename::Independent(RenameIndependent::Both {
-                serialize: name.to_owned(),
-                deserialize: name.to_owned(),
+                serialize: "ser".to_owned(),
+                deserialize: "de".to_owned(),
             })
             .ser_name(),
-            Some(name.as_str())
+            Some("ser")
         );
         assert_eq!(
             Rename::Independent(RenameIndependent::Both {
-                serialize: name.to_owned(),
-                deserialize: name.to_owned(),
+                serialize: "ser".to_owned(),
+                deserialize: "de".to_owned(),
             })
             .de_name(),
-            Some(name.as_str())
+            Some("de")
         );
     }
 }

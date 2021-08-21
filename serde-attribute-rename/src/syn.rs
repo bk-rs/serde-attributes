@@ -11,19 +11,16 @@ pub const SERIALIZE: &str = "serialize";
 /// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/symbol.rs#L14)
 pub const DESERIALIZE: &str = "deserialize";
 
-/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/attr.rs#L319-L333)
-impl<'a> TryFrom<&'a Meta> for Rename {
-    type Error = FromMetaError<'a>;
-
-    fn try_from(meta: &'a Meta) -> Result<Self, Self::Error> {
+impl Rename {
+    pub fn try_from_meta<'a>(meta: &'a Meta, path_name: &str) -> Result<Self, FromMetaError<'a>> {
         match meta {
-            Meta::NameValue(ref meta_name_value) if meta_name_value.path.is_ident(RENAME) => {
+            Meta::NameValue(ref meta_name_value) if meta_name_value.path.is_ident(path_name) => {
                 match &meta_name_value.lit {
                     Lit::Str(ref s) => Ok(Self::Normal(s.value())),
                     lit => Err(FromMetaError::LitTypeMismatch(lit)),
                 }
             }
-            Meta::List(ref meta_list) if meta_list.path.is_ident(RENAME) => {
+            Meta::List(ref meta_list) if meta_list.path.is_ident(path_name) => {
                 let mut ser_name = None;
                 let mut de_name = None;
 
@@ -78,6 +75,15 @@ impl<'a> TryFrom<&'a Meta> for Rename {
             }
             meta => Err(FromMetaError::MetaTypeOrPathMismatch(meta)),
         }
+    }
+}
+
+/// [Ref](https://github.com/serde-rs/serde/blob/v1.0.127/serde_derive/src/internals/attr.rs#L319-L333)
+impl<'a> TryFrom<&'a Meta> for Rename {
+    type Error = FromMetaError<'a>;
+
+    fn try_from(meta: &'a Meta) -> Result<Self, Self::Error> {
+        Self::try_from_meta(meta, RENAME)
     }
 }
 
