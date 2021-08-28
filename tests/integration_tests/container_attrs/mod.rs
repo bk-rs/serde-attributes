@@ -1,6 +1,6 @@
 mod helpers;
 
-use helpers::parse_serde_meta;
+use helpers::*;
 
 #[cfg(test)]
 mod rename;
