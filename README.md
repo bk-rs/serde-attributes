@@ -12,4 +12,6 @@ cargo fmt -- --check
 
 cargo build-all-features
 cargo test-all-features -- --nocapture
+
+cargo test --features _integration_tests --test integration_tests -- --nocapture
 ```

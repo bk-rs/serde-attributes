@@ -26,6 +26,8 @@ attr-rename-all = [ "attr-rename", "serde-rename-rule" ]
 with-syn = [ "syn" ]
 with-darling = [ "with-syn", "darling_core" ]
 
+_integration_tests = [ "all-attrs", "with-syn", "with-darling" ]
+
 [dependencies]
 syn = { version = "1.0", default-features = false, features = [ "derive", "parsing" ], optional = true }
 darling_core = { version = "0.13", default-features = false, optional = true }
@@ -34,6 +36,7 @@ darling_core = { version = "0.13", default-features = false, optional = true }
 serde-rename-rule = { version = "0.1.1", default-features = false, optional = true }
 
 [dev-dependencies]
+serde = { version = "1.0", features = ["derive"] }
 darling = { version = "0.13", default-features = false }
 
 [package.metadata.cargo-all-features]
@@ -42,5 +45,7 @@ skip_feature_sets = [
     ["attr-alias", "attr-rename"],
     ["attr-alias", "attr-rename-all"],
     ["attr-alias", "attr-rename", "attr-rename-all"],
+    # 
+    ["_integration_tests"],
 ]
 skip_optional_dependencies = true
