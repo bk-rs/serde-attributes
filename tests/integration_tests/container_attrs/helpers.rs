@@ -3,7 +3,8 @@ use serde_attributes::{Rename, RenameAll};
 use syn::{parse_str, DeriveInput, Meta, MetaList, NestedMeta};
 
 pub fn parse_serde_meta(input: &str) -> Meta {
-    let attrs = parse_str::<DeriveInput>(input).unwrap().attrs;
+    let derive_input = parse_str::<DeriveInput>(input).unwrap();
+    let attrs = &derive_input.attrs;
     match attrs[0].parse_meta().unwrap() {
         Meta::List(MetaList {
             path,

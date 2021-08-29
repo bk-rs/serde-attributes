@@ -19,34 +19,3 @@ impl FromMeta for Alias {
         })
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    use darling::FromDeriveInput;
-    use syn::parse_str;
-
-    #[derive(Debug, FromDeriveInput)]
-    #[darling(attributes(serde))]
-    struct SerdeDerive {
-        alias: Alias,
-    }
-
-    fn to_serde_derive(input: &str) -> Result<SerdeDerive, DarlingError> {
-        SerdeDerive::from_derive_input(&parse_str(input).unwrap())
-    }
-
-    #[test]
-    fn test_simple() {
-        let input = r#"
-        #[derive(SerdeDerive)]
-        #[serde(alias = "name")]
-        pub struct Foo;
-        "#;
-        assert_eq!(
-            to_serde_derive(input).unwrap().alias,
-            Alias("name".to_owned())
-        );
-    }
-}
