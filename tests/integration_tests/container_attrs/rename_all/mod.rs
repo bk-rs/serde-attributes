@@ -1,7 +1,4 @@
-mod independent_both;
-mod independent_only_deserialize;
-mod independent_only_serialize;
-mod normal;
+mod examples;
 
 //
 //
@@ -16,46 +13,48 @@ use super::{parse_darling_rename_all, parse_serde_meta};
 
 #[test]
 fn simple() {
-    let input = include_str!("normal.rs");
+    let lines: Vec<_> = include_str!("examples.rs").lines().collect();
+
+    let input = lines[0..=2].join("\r\n");
     assert_eq!(
-        RenameAll::try_from(&parse_serde_meta(input)).unwrap(),
+        RenameAll::try_from(&parse_serde_meta(&input)).unwrap(),
         RenameAll::Normal(RenameRule::SnakeCase)
     );
     assert_eq!(
-        parse_darling_rename_all(input).unwrap(),
+        parse_darling_rename_all(&input).unwrap(),
         RenameAll::Normal(RenameRule::SnakeCase)
     );
 
-    let input = include_str!("independent_only_serialize.rs");
+    let input = lines[4..=6].join("\r\n");
     assert_eq!(
-        RenameAll::try_from(&parse_serde_meta(input)).unwrap(),
+        RenameAll::try_from(&parse_serde_meta(&input)).unwrap(),
         RenameAll::Independent(RenameAllIndependent::Serialize(RenameRule::LowerCase))
     );
     assert_eq!(
-        parse_darling_rename_all(input).unwrap(),
+        parse_darling_rename_all(&input).unwrap(),
         RenameAll::Independent(RenameAllIndependent::Serialize(RenameRule::LowerCase))
     );
 
-    let input = include_str!("independent_only_deserialize.rs");
+    let input = lines[8..=10].join("\r\n");
     assert_eq!(
-        RenameAll::try_from(&parse_serde_meta(input)).unwrap(),
+        RenameAll::try_from(&parse_serde_meta(&input)).unwrap(),
         RenameAll::Independent(RenameAllIndependent::Deserialize(RenameRule::UpperCase))
     );
     assert_eq!(
-        parse_darling_rename_all(input).unwrap(),
+        parse_darling_rename_all(&input).unwrap(),
         RenameAll::Independent(RenameAllIndependent::Deserialize(RenameRule::UpperCase))
     );
 
-    let input = include_str!("independent_both.rs");
+    let input = lines[12..=14].join("\r\n");
     assert_eq!(
-        RenameAll::try_from(&parse_serde_meta(input)).unwrap(),
+        RenameAll::try_from(&parse_serde_meta(&input)).unwrap(),
         RenameAll::Independent(RenameAllIndependent::Both {
             serialize: RenameRule::LowerCase,
             deserialize: RenameRule::UpperCase
         })
     );
     assert_eq!(
-        parse_darling_rename_all(input).unwrap(),
+        parse_darling_rename_all(&input).unwrap(),
         RenameAll::Independent(RenameAllIndependent::Both {
             serialize: RenameRule::LowerCase,
             deserialize: RenameRule::UpperCase
